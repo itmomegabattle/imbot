@@ -1,0 +1,418 @@
+:root {
+  color-scheme: dark;
+  --blue: #0069e0;
+  --blue-2: #0085ff;
+  --black: #000000;
+  --near-black: #05070b;
+  --white: #ffffff;
+  --muted: #a9b4c7;
+  --grid: rgba(255, 255, 255, 0.12);
+  --shadow: #003b86;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--black);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--white);
+  font-family: "Arial Black", Impact, system-ui, sans-serif;
+  letter-spacing: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 13px, rgba(255, 255, 255, 0.035) 13px 14px),
+    repeating-linear-gradient(90deg, transparent 0 13px, rgba(255, 255, 255, 0.028) 13px 14px),
+    radial-gradient(circle at 14% 18%, rgba(0, 133, 255, 0.62), transparent 18%),
+    linear-gradient(135deg, var(--black) 0%, #001933 54%, var(--blue) 100%);
+}
+
+body::before,
+body::after {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+}
+
+body::before {
+  inset: 0;
+  background:
+    repeating-radial-gradient(ellipse at 11% 9%, transparent 0 16px, rgba(255, 255, 255, 0.38) 17px, transparent 18px),
+    repeating-radial-gradient(ellipse at 97% 4%, transparent 0 18px, rgba(255, 255, 255, 0.24) 19px, transparent 20px);
+  opacity: 0.36;
+}
+
+body::after {
+  right: 0;
+  bottom: 0;
+  width: 112px;
+  height: 112px;
+  background:
+    linear-gradient(var(--blue), var(--blue)) 0 0 / 28px 28px,
+    linear-gradient(var(--blue), var(--blue)) 28px 28px / 28px 28px,
+    linear-gradient(var(--white), var(--white)) 56px 56px / 28px 28px,
+    linear-gradient(var(--blue), var(--blue)) 84px 84px / 28px 28px;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.9;
+}
+
+.pixel-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+  mix-blend-mode: screen;
+  opacity: 0.22;
+}
+
+.shell {
+  position: relative;
+  z-index: 2;
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 14px 30px;
+}
+
+.hero,
+.level,
+.quick article,
+.tile,
+.item {
+  position: relative;
+  border: 2px solid var(--white);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.82);
+  box-shadow: 7px 7px 0 var(--shadow);
+}
+
+.hero::after,
+.level::after,
+.tile::after,
+.item::after,
+.quick article::after {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 14px;
+  height: 14px;
+  background: var(--blue-2);
+  content: "";
+}
+
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 166px;
+  padding: 16px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(0, 105, 224, 0.35), rgba(0, 0, 0, 0.9)),
+    var(--black);
+}
+
+.hero::before {
+  position: absolute;
+  inset: auto -18px -18px auto;
+  width: 148px;
+  height: 148px;
+  background:
+    linear-gradient(var(--blue), var(--blue)) 0 0 / 37px 37px,
+    linear-gradient(var(--white), var(--white)) 37px 37px / 37px 37px,
+    linear-gradient(var(--blue), var(--blue)) 74px 74px / 37px 37px,
+    linear-gradient(var(--blue-2), var(--blue-2)) 111px 111px / 37px 37px;
+  background-repeat: no-repeat;
+  content: "";
+  opacity: 0.82;
+}
+
+.brand-lockup {
+  display: inline-grid;
+  margin-bottom: 12px;
+  padding: 9px 10px;
+  border: 2px solid var(--white);
+  background: var(--white);
+  color: var(--black);
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 900;
+  line-height: 0.84;
+  transform: skew(-7deg);
+}
+
+.brand-lockup span:nth-child(2)::after {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-left: -4px;
+  background: var(--blue);
+  content: "";
+  vertical-align: -3px;
+}
+
+.level,
+section {
+  margin-top: 17px;
+}
+
+.level {
+  padding: 15px;
+  background: var(--white);
+  color: var(--black);
+}
+
+.eyebrow,
+.muted {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin-top: 6px;
+  max-width: 13ch;
+  font-size: clamp(32px, 10vw, 56px);
+  font-style: italic;
+  line-height: 0.84;
+  text-shadow: 4px 4px 0 var(--blue);
+  word-break: break-word;
+}
+
+h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 11px;
+  font-size: 17px;
+  line-height: 1;
+}
+
+h2 span {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 22px;
+  background: var(--blue);
+  color: var(--white);
+  font-size: 12px;
+}
+
+.role,
+.badge {
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-radius: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.role {
+  position: relative;
+  z-index: 2;
+  padding: 7px 9px;
+  background: var(--blue);
+  color: var(--white);
+  font-size: 11px;
+  box-shadow: 4px 4px 0 var(--black);
+}
+
+.level-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.level .eyebrow,
+.level .muted {
+  color: #303642;
+}
+
+.level-head h2 {
+  display: block;
+  margin: 4px 0 0;
+  color: var(--black);
+  font-size: 22px;
+  font-style: italic;
+}
+
+#xp {
+  padding: 6px 8px;
+  border: 2px solid var(--black);
+  background: var(--blue);
+  color: var(--white);
+  white-space: nowrap;
+  box-shadow: 4px 4px 0 var(--black);
+}
+
+.progress {
+  overflow: hidden;
+  height: 18px;
+  margin: 16px 0 10px;
+  border: 2px solid var(--black);
+  background:
+    repeating-linear-gradient(90deg, #d9d9d9 0 9px, #ffffff 9px 18px);
+}
+
+.progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(90deg, var(--blue) 0 12px, var(--blue-2) 12px 24px);
+  transition: width 160ms steps(8);
+}
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.quick article {
+  min-height: 82px;
+  padding: 12px;
+  background: var(--black);
+}
+
+.quick span,
+.tile span {
+  display: block;
+  color: var(--muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.quick strong,
+.tile strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--white);
+  font-size: 29px;
+  line-height: 0.95;
+  text-shadow: 3px 3px 0 var(--blue);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 11px;
+}
+
+.tile,
+.item {
+  padding: 13px;
+}
+
+.tile:nth-child(odd),
+.item:nth-child(odd) {
+  background: var(--white);
+  color: var(--black);
+  box-shadow: 7px 7px 0 var(--blue);
+}
+
+.tile:nth-child(odd) span,
+.item:nth-child(odd) .muted {
+  color: #313946;
+}
+
+.tile:nth-child(odd) strong {
+  color: var(--black);
+  text-shadow: 3px 3px 0 rgba(0, 105, 224, 0.45);
+}
+
+.list {
+  display: grid;
+  gap: 11px;
+}
+
+.item {
+  display: grid;
+  gap: 7px;
+}
+
+.item strong {
+  font-size: 15px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.badge {
+  padding: 5px 7px;
+  background: var(--blue);
+  color: var(--white);
+  font-size: 10px;
+  line-height: 1;
+  box-shadow: 3px 3px 0 var(--black);
+}
+
+.badge.done {
+  background: var(--white);
+  color: var(--black);
+}
+
+.badge.warn {
+  background: var(--black);
+  color: var(--white);
+}
+
+@media (max-width: 420px) {
+  .shell {
+    padding-inline: 11px;
+  }
+
+  .hero {
+    min-height: 158px;
+  }
+
+  .quick {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 7px;
+  }
+
+  .quick article {
+    min-height: 74px;
+    padding: 10px 8px;
+  }
+
+  .quick span {
+    font-size: 9px;
+  }
+
+  .quick strong {
+    font-size: 24px;
+  }
+}

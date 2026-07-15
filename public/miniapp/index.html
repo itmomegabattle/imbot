@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IMB Mini App</title>
+    <link rel="stylesheet" href="/styles.css?v=pixel-imb-1" />
+  </head>
+  <body>
+    <div class="pixel-noise" aria-hidden="true"></div>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <div class="brand-lockup" aria-label="ITMO MEGA BATTLE">
+            <span>ITMO</span>
+            <span>MEGA</span>
+            <span>BATTLE</span>
+          </div>
+          <p class="eyebrow">участник / mini app</p>
+          <h1 id="name">Профиль</h1>
+          <p class="muted">уровни, баланс, события</p>
+        </div>
+        <span id="role" class="role">участник</span>
+      </section>
+
+      <section class="level">
+        <div class="level-head">
+          <div>
+            <p class="eyebrow">level pass</p>
+            <h2 id="levelTitle">...</h2>
+          </div>
+          <strong id="xp">0 XP</strong>
+        </div>
+        <div class="progress"><span id="progress"></span></div>
+        <p id="nextLevel" class="muted">До следующего уровня...</p>
+      </section>
+
+      <section class="quick">
+        <article>
+          <span>Стрик</span>
+          <strong id="streak">0</strong>
+        </article>
+        <article>
+          <span>Регистрации</span>
+          <strong id="registrations">0</strong>
+        </article>
+        <article>
+          <span>Чекины</span>
+          <strong id="checkins">0</strong>
+        </article>
+      </section>
+
+      <section>
+        <h2><span>01</span> Баланс</h2>
+        <div id="balance" class="grid"></div>
+      </section>
+
+      <section>
+        <h2><span>02</span> Мероприятия</h2>
+        <div id="events" class="list"></div>
+      </section>
+
+      <section>
+        <h2><span>03</span> Активность</h2>
+        <div id="activity" class="list"></div>
+      </section>
+    </main>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
