@@ -1,7 +1,6 @@
 import { NextFunction } from "grammy";
 import { SigmaContext } from "../context";
 import { getAccessLevel } from "../../services/auth";
-import { userStore } from "../../state/userStore";
 import { AccessLevel } from "../../api/types";
 import { logger } from "../../logger";
 
@@ -11,6 +10,7 @@ import { logger } from "../../logger";
  * сами решают, какой уровень им нужен (см. requireAccess ниже).
  */
 export async function accessControl(ctx: SigmaContext, next: NextFunction) {
+  ctx.accessLevel = AccessLevel.NOBODY;
   const tgId = ctx.from?.id;
   if (tgId === undefined) {
     return next();
@@ -21,7 +21,6 @@ export async function accessControl(ctx: SigmaContext, next: NextFunction) {
     logger.error(`accessControl: failed to resolve access level for ${tgId}`, err);
     ctx.accessLevel = AccessLevel.NOBODY;
   }
-  ctx.botUser = userStore.get(tgId);
   return next();
 }
 

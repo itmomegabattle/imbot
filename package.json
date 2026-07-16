@@ -2,14 +2,15 @@
   "name": "@itmomegabattle/imbot",
   "version": "1.0.0",
   "description": "ITMO Megabattle participant Telegram bot and pixel Mini App",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "type": "commonjs",
   "scripts": {
     "build": "tsc -p .",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run build",
+    "webhook:set": "node dist/src/scripts/setWebhook.js"
   },
   "dependencies": {
     "axios": "^1.7.7",

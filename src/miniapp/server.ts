@@ -2,11 +2,9 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 import { config } from "../config";
-import { appStore } from "../state/appStore";
 import { logger } from "../logger";
-import { usesRemoteBackend } from "../services/backend";
 
-const PUBLIC_DIR = path.resolve(__dirname, "../../public/miniapp");
+const PUBLIC_DIR = path.resolve(process.cwd(), "public/miniapp");
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -21,15 +19,11 @@ export function startMiniAppServer() {
     try {
       const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "127.0.0.1"}`);
       if (url.pathname === "/health") {
-        sendJson(res, { status: "ok", service: "imbot", backendMode: config.backendMode });
+        sendJson(res, { status: "ok", service: "imbot", backend: config.apiBaseUrl });
         return;
       }
       if (url.pathname === "/api/miniapp/session" && req.method === "POST") {
         proxyMiniAppSession(req, res);
-        return;
-      }
-      if (url.pathname === "/api/miniapp/profile" && !usesRemoteBackend) {
-        sendJson(res, buildProfile(Number(url.searchParams.get("tgId"))));
         return;
       }
       serveStatic(url.pathname, res);
@@ -65,41 +59,6 @@ function proxyMiniAppSession(req: http.IncomingMessage, res: http.ServerResponse
       sendJson(res, { ok: false, error: "backend_unavailable" }, 503);
     }
   });
-}
-
-function buildProfile(tgId: number) {
-  const user = appStore.getUser(tgId);
-  if (!Number.isFinite(tgId) || !user) return { ok: false, error: "user_not_found" };
-  const currencies = appStore.userCurrencies(tgId);
-  const level = appStore.levelProgress(tgId);
-  const events = appStore.eventsForCurrentSeason().map((event) => ({
-    id: event.id,
-    title: event.title,
-    description: event.description,
-    startsAt: event.date_begin,
-    registered: user.registeredEventIds.includes(event.id),
-    attended: user.attendedEventIds.includes(event.id),
-  }));
-  return {
-    ok: true,
-    user: {
-      id: user.id,
-      tgId: user.tgId,
-      name: `${user.firstName} ${user.lastName}`.trim(),
-      username: user.username,
-      isManager: user.isManager,
-    },
-    stats: {
-      streak: user.attendedEventIds.length,
-      registrations: user.registeredEventIds.length,
-      checkins: user.attendedEventIds.length,
-    },
-    level,
-    currencies,
-    events,
-    scoreHistory: appStore.scoreHistory(tgId).slice(0, 8),
-    currencyHistory: appStore.currencyHistory(tgId).slice(0, 8),
-  };
 }
 
 function serveStatic(requestPath: string, res: http.ServerResponse) {

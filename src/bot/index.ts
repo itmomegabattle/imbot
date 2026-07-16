@@ -35,6 +35,7 @@ export function createBot(): Bot<SigmaContext> {
     } else if (e instanceof HttpError) {
       logger.error("Could not reach Telegram:", e);
     }
+    void ctx.reply("Не удалось выполнить действие. Попробуй ещё раз; если ошибка повторится — напиши организатору.").catch(() => undefined);
   });
 
   return bot;

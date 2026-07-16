@@ -1,38 +1,16 @@
 import { Bot } from "grammy";
 import { SigmaContext } from "../context";
 import { AccessLevel } from "../../api/types";
-import { codeManager, CodeError } from "../../state/codeManager";
-import { logger } from "../../logger";
+import { backend } from "../../services/backend";
 
-const CODE_RE = /^\d{6}$/;
-
-/**
- * Ловит "голые" текстовые сообщения (не команды). Если это похоже на 6-значный
- * код — пробует применить его (перевод валюты / ачивка / отметка на меро).
- * Регистрировать эту команду нужно ПОСЛЕДНЕЙ — она самый широкий обработчик,
- * как и UseCodeWithoutCommand в оригинальном bot.py.
- */
 export function registerCodeHandler(bot: Bot<SigmaContext>) {
   bot.on("message:text", async (ctx) => {
-    if (ctx.accessLevel < AccessLevel.USER) {
-      await ctx.reply("Сначала нужно зарегистрироваться — отправьте /start.");
-      return;
-    }
-    const text = ctx.message.text.trim();
-    if (!CODE_RE.test(text)) {
-      await ctx.reply("Не понимаю эту команду. Отправьте /help, чтобы увидеть список доступных команд.");
-      return;
-    }
+    if (ctx.accessLevel < AccessLevel.USER) return void (await ctx.reply("Сначала отправь /start."));
+    const code = ctx.message.text.trim();
+    if (!/^[A-Za-z0-9_-]{3,100}$/.test(code)) return void (await ctx.reply("Не понимаю сообщение. Список команд — /help."));
     try {
-      const resultText = await codeManager.use(text, ctx.from!.id);
-      await ctx.reply(resultText);
-    } catch (err) {
-      if (err instanceof CodeError) {
-        await ctx.reply(err.message);
-      } else {
-        logger.error("codes: unexpected error applying code", err);
-        await ctx.reply("Возникла ошибка, попробуйте ещё раз.");
-      }
-    }
+      const result = await backend.redeem(ctx.from!.id, code);
+      await ctx.reply(`Код применён: ${result.label}${result.xp ? `, +${result.xp} XP` : ""}${result.currencyAmount ? `, +${result.currencyAmount} валюты` : ""}`);
+    } catch (error: any) { await ctx.reply(`Код не применён: ${error.response?.data?.error ?? "неверный или уже использован"}`); }
   });
 }

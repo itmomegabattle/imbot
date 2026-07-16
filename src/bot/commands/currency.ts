@@ -2,52 +2,27 @@ import { Bot } from "grammy";
 import { SigmaContext } from "../context";
 import { requireAccess } from "../middleware/accessControl";
 import { AccessLevel } from "../../api/types";
-import { formatCurrencies } from "../utils/format";
-import { codeManager } from "../../state/codeManager";
-import { appStore } from "../../state/appStore";
-import { backend, usesRemoteBackend } from "../../services/backend";
+import { backend } from "../../services/backend";
 
 export function registerCurrencyCommands(bot: Bot<SigmaContext>) {
   bot.command("balance", requireAccess(AccessLevel.USER), async (ctx) => {
-    if (usesRemoteBackend) {
-      const dashboard = await backend.dashboard(ctx.from!.id);
-      const history = dashboard.currencyHistory.slice(0, 5);
-      const historyText = history.length
-        ? `\n\n*Последние операции:*\n${history.map((event) => `${event.amount > 0 ? "+" : ""}${event.amount} — ${event.reason}`).join("\n")}`
-        : "";
-      await ctx.reply(`*Ваш баланс:*\n${formatCurrencies(dashboard.currencies)}${historyText}`, { parse_mode: "Markdown" });
-      return;
-    }
-    const history = appStore.currencyHistory(ctx.from!.id).slice(0, 5);
-    const historyText = history.length
-      ? `\n\n*Последние операции:*\n${history.map((e) => `${e.amount > 0 ? "+" : ""}${e.amount} — ${e.reason}`).join("\n")}`
-      : "";
-    await ctx.reply(`*Ваш баланс:*\n${formatCurrencies(appStore.userCurrencies(ctx.from!.id))}${historyText}`, { parse_mode: "Markdown" });
+    const dashboard = await backend.dashboard(ctx.from!.id);
+    const lines = dashboard.currencies.map((item) => `${item.name}: <b>${item.amount}</b>`).join("\n") || "Баланс пока пуст";
+    await ctx.reply(`💙 <b>Баланс</b>\n${lines}\n\nОбщий баланс факультета: <b>${dashboard.facultyBalance ?? 0}</b>`, { parse_mode: "HTML" });
   });
 
-  bot.command("give_currency", requireAccess(AccessLevel.MANAGER), async (ctx) => {
-    const args = ctx.match?.toString().trim().split(/\s+/).filter(Boolean) ?? [];
-    if (args.length < 2) {
-      await ctx.reply("Использование: /give_currency <название валюты> <сумма>\nНапример: /give_currency Кредиты 50");
-      return;
+  bot.command("transfer", requireAccess(AccessLevel.USER), async (ctx) => {
+    const parts = ctx.match.toString().trim().split(/\s+/);
+    const rawAmount = parts.pop();
+    const nickname = parts.join(" ");
+    const amount = Number(rawAmount);
+    if (!nickname || !Number.isInteger(amount) || amount < 10) return void (await ctx.reply("Использование: /transfer <никнейм> <сумма>\nМинимум — 10, только целые числа."));
+    try {
+      const recipient = await backend.publicProfile(nickname.replace(/^@/, ""));
+      const result = await backend.transfer(ctx.from!.id, recipient.id, amount, `telegram-update:${ctx.update.update_id}:transfer`);
+      await ctx.reply(`Переведено ${result.amount ?? amount} валюты пользователю ${recipient.nickname}.`);
+    } catch (error: any) {
+      await ctx.reply(`Перевод не выполнен: ${error.response?.data?.error ?? "проверь никнейм и баланс"}`);
     }
-    const amount = Number(args[args.length - 1]);
-    const currencyQuery = args.slice(0, -1).join(" ").toLowerCase();
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      await ctx.reply("Сумма должна быть положительным числом.");
-      return;
-    }
-
-    const match = appStore.currencies().find((c) => c.name.toLowerCase().includes(currencyQuery));
-    if (!match) {
-      await ctx.reply(`Валюта «${currencyQuery}» не найдена. Доступные: ${appStore.currencies().map((c) => c.name).join(", ")}`);
-      return;
-    }
-    const code = codeManager.emitTransferCode(match.id, String(amount));
-    await ctx.reply(
-      `Код на +${amount} ${match.name} сгенерирован:\n\`${code}\`\n\nОтправьте его получателю или зашейте в NFC-метку. Код одноразовый, действителен 90 дней.`,
-      { parse_mode: "Markdown" },
-    );
   });
 }

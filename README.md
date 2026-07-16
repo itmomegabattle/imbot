@@ -1,6 +1,6 @@
 # IMBot — бот участников ITMO Megabattle
 
-Telegram-бот участников и пиксельная Mini App. Production-данные получает из [`itmomegabattle/imb_backend`](https://github.com/itmomegabattle/imb_backend); локальный JSON-режим сохранён только для автономной разработки интерфейса.
+Telegram-бот участников и пиксельно-стеклянная Mini App. Единственный источник данных — [`itmomegabattle/imb_backend`](https://github.com/itmomegabattle/imb_backend). Локального JSON-состояния и прямого доступа к Supabase нет.
 
 ## Возможности
 
@@ -8,14 +8,17 @@ Telegram-бот участников и пиксельная Mini App. Productio
 - `/me` — профиль и прогресс уровня;
 - `/balance` — внутренняя валюта;
 - `/top` — рейтинг по XP;
-- `/events` — мероприятия и регистрация;
+- `/setup Имя или ник | Факультет` — обязательные данные участника;
+- `/events` — внешняя, индивидуальная и командная регистрация;
+- `/team_create`, `/team_join`, `/team`, `/team_complete`, `/team_rotate` — команды;
+- `/transfer ник сумма` — перевод целой валюты от 10 единиц;
 - `/freshman` — справка для первокурсников;
-- одноразовые коды посещения, валюты и достижений;
-- новости и базовые команды организатора.
+- одноразовые наградные коды;
+- админ-команды рассылок, XP/валюты, ачивок, статистики, справки, событий и ролей.
 
 ## Связь с backend
 
-В `BACKEND_MODE=remote` бот:
+Бот всегда:
 
 1. регистрирует Telegram identity через сервисный API;
 2. получает профиль, XP, валюту, события и рейтинг из PostgreSQL;
@@ -39,7 +42,6 @@ npm run dev
 
 ```env
 BOT_TOKEN=токен-от-BotFather
-BACKEND_MODE=remote
 API_BASE_URL=http://localhost:4000
 SERVICE_TOKEN=тот-же-секрет-что-PARTICIPANT_BOT_SERVICE_TOKEN-на-backend
 MINI_APP_PORT=3000
@@ -49,15 +51,11 @@ MINI_APP_URL=https://публичный-https-url-mini-app
 
 Проверка Mini App-сервера: `GET http://localhost:3000/health`.
 
-## Автономный режим
-
-Для работы без БД установите `BACKEND_MODE=local`. Тогда состояние создаётся в `data/*.json`. Эти файлы исключены из Git и не предназначены для production.
-
 ## Развёртывание
 
-Текущий бот работает в режиме Telegram long polling, поэтому ему нужен постоянно запущенный Node-процесс: VPS, ITMO-сервер, Render/Fly/Railway или аналогичная платформа. Vercel подходит для статической Mini App и serverless webhook, но не для постоянно работающего long polling-процесса.
+На VPS `npm start` запускает long polling и Mini App одним процессом. На Vercel используются `api/webhook.ts`, `api/miniapp-session.ts`, статическая папка `public/miniapp` и `vercel.json`; постоянный процесс не нужен.
 
-Docker-образ запускает и бота, и Mini App одним процессом. Для перехода на Vercel Functions потребуется отдельно включить Telegram webhook-режим.
+После Vercel-деплоя задайте `WEBHOOK_BASE_URL`, `WEBHOOK_SECRET`, `BOT_TOKEN`, `API_BASE_URL`, `SERVICE_TOKEN`, `MINI_APP_URL`, соберите проект и один раз выполните `npm run webhook:set`. В BotFather укажите домен Mini App.
 
 ## Проверка перед релизом
 

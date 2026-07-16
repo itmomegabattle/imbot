@@ -1,14 +1,10 @@
 import { createBot } from "./bot";
-import { userStore } from "./state/userStore";
-import { appStore } from "./state/appStore";
 import { logger } from "./logger";
 import { startMiniAppServer } from "./miniapp/server";
 import { config } from "./config";
 
 async function main() {
   logger.info("Starting ITMO Megabattle participant bot...");
-  userStore.load();
-  appStore.load();
   startMiniAppServer();
 
   const bot = createBot();
