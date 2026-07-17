@@ -35,6 +35,21 @@ const ADMIN_HELP_TEXT = `
 
 export function registerStartCommands(bot: Bot<SigmaContext>) {
   bot.command("start", async (ctx) => {
+    const startPayload = ctx.match?.toString().trim() ?? "";
+    const webLogin = /^login_([A-Za-z0-9_-]{32})$/.exec(startPayload);
+    if (webLogin) {
+      try {
+        const result = await backend.approveWebLogin(ctx.from!.id, webLogin[1]);
+        await ctx.reply(
+          "✅ Вход подтверждён. Сайт авторизуется автоматически — вернись в открытую вкладку.",
+          { reply_markup: new InlineKeyboard().url("Вернуться на сайт", result.returnUrl) },
+        );
+      } catch (error) {
+        await ctx.reply("Не удалось подтвердить вход. Вернись на сайт и создай новую ссылку.");
+      }
+      return;
+    }
+
     const greeting =
       ctx.accessLevel === AccessLevel.NOBODY
         ? "Привет! Не удалось создать профиль, попробуй ещё раз.\n\n"
