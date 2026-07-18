@@ -41,15 +41,6 @@ class BackendClient {
     return data;
   }
 
-  async approveWebLogin(telegramId: number, startToken: string) {
-    const { data } = await this.api.post<{ ok: true; returnUrl: string; expiresIn: number }>(
-      "/auth/service/telegram-web-login/approve",
-      { telegramId, startToken },
-      { headers: { "X-Service-Token": config.serviceToken } },
-    );
-    return data;
-  }
-
   private async token(telegramId: number) {
     const cached = this.sessions.get(telegramId);
     if (cached && cached.expiresAt > Date.now() + 60_000) return cached.token;
